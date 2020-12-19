@@ -26,9 +26,10 @@
       >
         <div
           class="box"
-          :style="computeBoxWidth"
           v-for="item in vItems"
           :key="item.id"
+          :style="computeBoxWidth"
+          @click.stop="click(item)"
         >
           <slot :item="item"></slot>
         </div>
@@ -43,170 +44,191 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    items: Array,
-    title: String,
-    chunkSize: {
-      type: Number,
-      default: 6,
-    },
-    translationDuration: {
-      type: Number,
-      default: 700,
-    },
-    loop: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  data() {
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+
+const defaultValues = {
+  items: () => [],
+  title: "",
+  chunkSize: 6,
+  translationDuration: 700,
+  loop: true,
+};
+
+@Component
+export default class Slider<T> extends Vue {
+  @Prop({ default: defaultValues.items() }) items!: T[];
+  @Watch("items")
+  onItemsUpdate(v: T[]) {
+    console.log("onItemsUpdate", v);
+    this.vItems = [...v];
+    this.pagesCount = Math.floor(this.vItems.length / this.chunkSize);
+  }
+  @Prop({ default: defaultValues.title }) title!: string;
+  @Prop({ default: defaultValues.chunkSize }) chunkSize!: number;
+  @Prop({ default: defaultValues.loop }) loop!: boolean;
+  @Prop({ default: defaultValues.translationDuration })
+  translationDuration!: number;
+
+  isInfinite = false;
+  pagesCount = 0;
+  activePage = 1;
+  vItems: T[] = !this.items?[]:[...this.items];
+  inTransition = false;
+  translate = 0;
+  rawBoxPart = 20;
+
+  constructor() {
+    super();
+  }
+
+  private readonly translationUnity = 100;
+
+  get computeItemRatio(): number {
+    return 100 / this.chunkSize;
+  }
+
+  get sliderTransform() {
+    return `translateX(calc(${this.translate}% + ${Math.abs(
+      this.translate
+    )}px))`;
+  }
+
+  get computeBoxWidth() {
+    return `width: calc(${this.computeItemRatio}% - 10px + 5px);`;
+  }
+
+  get computeSliderCssVariables() {
     return {
-      $_isInfinite: false,
-      pagesCount: 0,
-      activePage: 1,
-      vItems: [],
-      inTransition: false,
-      translate: 0,
-      rawBoxPart: 20,
+      "--slider-transition-speed": this.translationDuration + "ms",
     };
-  },
-  methods: {
-    slide(isLeft = false) {
-      console.log("vier");
-      if (
-        this.inTransition === true ||
-        (!this.loop &&
-          ((!isLeft && this.activePage === this.pagesCount) ||
-            (isLeft && this.activePage === 1)))
-      )
-        return;
+  }
 
-      this.$emit(Events.slide, {
-        currentChunk: this.activePage,
-        directionLeft: 0,
-      });
+  get computeLeftNavDisabled() {
+    return this.computeIsNavDisabled(
+      this.loop,
+      this.pagesCount,
+      this.activePage,
+      true
+    );
+  }
 
-      if (this.loop === false) {
-        this.activePage = computeActivePage(
-          this.pagesCount,
-          this.activePage,
-          isLeft
-        );
+  get computeRightNavDisabled() {
+    return this.computeIsNavDisabled(
+      this.loop,
+      this.pagesCount,
+      this.activePage
+    );
+  }
 
-        setTimeout(() => {
-          this.inTransition = true;
-          isLeft
-            ? (this.translate += this.translationUnity)
-            : (this.translate -= this.translationUnity);
-        }, 0);
-        setTimeout(() => {
-          this.inTransition = false;
-        }, this.translationDuration);
-      } else {
-        this.activePage = computeActivePage(
-          this.pagesCount,
-          this.activePage,
-          isLeft
-        );
+  slide(isLeft = false) {
+    const event: SliderEvent = isLeft ? "slide_left" : "slide_right";
 
-        if (this.$_isInfinite) {
-          preReorder(this.vItems, isLeft);
-          this.translate += isLeft
-            ? -this.computeItemRatio
-            : this.computeItemRatio;
-        }
-        setTimeout(() => {
-          this.inTransition = true;
-          isLeft
-            ? (this.translate += this.translationUnity)
-            : (this.translate -= this.translationUnity);
-        }, 0);
-        setTimeout(() => {
-          this.inTransition = false;
-          if (this.$_isInfinite) {
-            this.translate = -this.translationUnity;
-            reorder(this.vItems, this.chunkSize, isLeft);
-          } else this.$_isInfinite = true;
-        }, this.translationDuration);
-      }
-    },
-  },
-  computed: {
-    translationUnity() {
-      return translationMovmentUnity;
-    },
-    computeItemRatio() {
-      return 100 / this.chunkSize;
-    },
-    sliderTransform() {
-      return `translateX(calc(${this.translate}% + ${Math.abs(
-        this.translate
-      )}px))`;
-    },
-    computeBoxWidth() {
-      return `width: calc(${this.computeItemRatio}% - 10px + 5px);`;
-    },
-    computeSliderCssVariables() {
-      return {
-        "--slider-transition-speed": this.translationDuration + "ms",
-      };
-    },
-    computeLeftNavDisabled() {
-      return computeIsNavDisabled(
-        this.loop,
+    if (
+      this.inTransition === true ||
+      (!this.loop &&
+        ((!isLeft && this.activePage === this.pagesCount) ||
+          (isLeft && this.activePage === 1)))
+    )
+      return;
+
+    this.$emit(event, {
+      currentChunk: this.activePage,
+      directionLeft: 0,
+    });
+
+    if (this.loop === false) {
+      this.activePage = this.computeActivePage(
         this.pagesCount,
         this.activePage,
-        true
+        isLeft
       );
-    },
-    computeRightNavDisabled() {
-      return computeIsNavDisabled(this.loop, this.pagesCount, this.activePage);
-    },
-  },
-  watch: {
-    items: function (newVal) {
-      this.vItems = newVal;
-      this.pagesCount = Math.floor(this.vItems.length / this.chunkSize);
-    },
-  },
-};
 
-const Events = { slide: "slide" };
+      setTimeout(() => {
+        this.inTransition = true;
+        isLeft
+          ? (this.translate += this.translationUnity)
+          : (this.translate -= this.translationUnity);
+      }, 0);
+      setTimeout(() => {
+        this.inTransition = false;
+      }, this.translationDuration);
+    } else {
+      this.activePage = this.computeActivePage(
+        this.pagesCount,
+        this.activePage,
+        isLeft
+      );
 
-const translationMovmentUnity = 100;
+      if (this.isInfinite) {
+        this.preReorder(this.vItems, isLeft);
+        this.translate += isLeft
+          ? -this.computeItemRatio
+          : this.computeItemRatio;
+      }
+      setTimeout(() => {
+        this.inTransition = true;
+        isLeft
+          ? (this.translate += this.translationUnity)
+          : (this.translate -= this.translationUnity);
+      }, 0);
+      setTimeout(() => {
+        this.inTransition = false;
+        if (this.isInfinite) {
+          this.translate = -this.translationUnity;
+          this.reorder(this.vItems, this.chunkSize, isLeft);
+        } else this.isInfinite = true;
+      }, this.translationDuration);
+    }
+  }
 
-const computeIsNavDisabled = (loop, pagesCount, activePage, isLeft = false) => {
-  return (
-    pagesCount > 0 &&
-    !loop &&
-    ((isLeft && activePage > 1) || (!isLeft && activePage < pagesCount - 1))
-  );
-};
+  click(item: T): void {
+    const evt: SliderEvent = "i_click";
+    this.$emit(evt, item);
+  }
 
-const computeActivePage = (pagesCount, activePage, isLeft = false) => {
-  if (activePage === pagesCount && !isLeft) activePage = 1;
-  else if (activePage === 1 && isLeft) activePage = pagesCount;
-  else activePage += isLeft ? -1 : +1;
-
-  return activePage;
-};
-
-const preReorder = (vItems, isLeft = false) => {
-  if (isLeft) vItems.unshift(...vItems.splice(vItems.length - 1, 1));
-  if (!isLeft) vItems.push(...vItems.splice(0, 1));
-};
-
-const reorder = (vItems, chunkSize, isLeft = false) => {
-  const itemsCount = vItems.length;
-  const itemsToReorder = chunkSize;
-  if (isLeft)
-    vItems.unshift(
-      ...vItems.splice(itemsCount - itemsToReorder + 1, itemsToReorder)
+  private computeIsNavDisabled(
+    loop: boolean,
+    pagesCount: number,
+    activePage: number,
+    isLeft = false
+  ) {
+    return (
+      pagesCount > 0 &&
+      !loop &&
+      ((isLeft && activePage > 1) || (!isLeft && activePage < pagesCount - 1))
     );
-  else vItems.push(...vItems.splice(0, itemsToReorder - 1));
-};
+  }
+
+  private computeActivePage(
+    pagesCount: number,
+    activePage: number,
+    isLeft = false
+  ) {
+    if (activePage === pagesCount && !isLeft) activePage = 1;
+    else if (activePage === 1 && isLeft) activePage = pagesCount;
+    else activePage += isLeft ? -1 : +1;
+
+    return activePage;
+  }
+
+  private preReorder = (vItems: T[], isLeft = false) => {
+    if (isLeft) vItems.unshift(...vItems.splice(vItems.length - 1, 1));
+    if (!isLeft) vItems.push(...vItems.splice(0, 1));
+  };
+
+  private reorder = (vItems: T[], chunkSize: number, isLeft = false) => {
+    const itemsCount = vItems.length;
+    const itemsToReorder = chunkSize;
+    if (isLeft)
+      vItems.unshift(
+        ...vItems.splice(itemsCount - itemsToReorder + 1, itemsToReorder)
+      );
+    else vItems.push(...vItems.splice(0, itemsToReorder - 1));
+  };
+}
+
+export type SliderEvent = "slide_left" | "slide_right" | "i_click";
 </script>
 <style scoped>
 /* HEADER */

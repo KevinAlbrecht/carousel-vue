@@ -1,0 +1,1 @@
+export { default as ToolsSlider } from "./components/slider/Slider.vue";

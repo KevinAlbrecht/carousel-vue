@@ -2,23 +2,36 @@
 	"name": "tools",
 	"version": "0.1.0",
 	"private": true,
-	"main": "./dist/tools.common.js",
+	"files": [
+		"dist/*",
+		"types/*"
+	],
+	"types": "./types/index.d.ts",
+	"main": "./dist/tools.umd.js",
 	"scripts": {
-		"build": "vue-cli-service build --target lib --name tools src/main.js",
-		"lint": "vue-cli-service lint"
+		"build": "vue-cli-service build --target lib src/index.ts",
+		"bp": "npm run build && npm pack && move ./tools-0.1.0.tgz .."
 	},
 	"dependencies": {
 		"core-js": "^3.6.5",
 		"vue": "^2.6.11"
 	},
+	"peerDependencies": {},
 	"devDependencies": {
+		"vue-class-component": "^7.2.3",
+		"vue-property-decorator": "^8.4.2",
+		"@typescript-eslint/eslint-plugin": "^2.33.0",
+		"@typescript-eslint/parser": "^2.33.0",
 		"@vue/cli-plugin-babel": "~4.5.0",
 		"@vue/cli-plugin-eslint": "~4.5.0",
 		"@vue/cli-service": "~4.5.0",
+		"@vue/cli-plugin-typescript": "~4.5.0",
+		"@vue/eslint-config-typescript": "^5.0.2",
 		"babel-eslint": "^10.1.0",
 		"eslint": "^6.7.2",
 		"eslint-plugin-vue": "^6.2.2",
-		"vue-template-compiler": "^2.6.11"
+		"vue-template-compiler": "^2.6.11",
+		"typescript": "~3.9.3"
 	},
 	"eslintConfig": {
 		"root": true,
@@ -27,12 +40,24 @@
 		},
 		"extends": [
 			"plugin:vue/essential",
-			"eslint:recommended"
+			"eslint:recommended",
+			"@vue/typescript/recommended"
 		],
 		"parserOptions": {
-			"parser": "babel-eslint"
+			"ecmaVersion": 2020
 		},
-		"rules": {}
+		"rules": {},
+		"overrides": [
+			{
+				"files": [
+					"**/__tests__/*.{j,t}s?(x)",
+					"**/tests/unit/**/*.spec.{j,t}s?(x)"
+				],
+				"env": {
+					"jest": true
+				}
+			}
+		]
 	},
 	"browserslist": [
 		"> 1%",
