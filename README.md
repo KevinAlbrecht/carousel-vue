@@ -1,24 +1,23 @@
-# tools
+# Slider vue
+
+This component is a simple slider, inspired by the netflix's movies one.
 
 ## Project setup
 ```
 npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
 npm run build
 ```
+Then you can package it
 
-### Lints and fixes files
-```
-npm run lint
-```
+/!\ Attention, the "bp" script use the windows command "move", switching to shelljs is in TODOs
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Roadmap
+- manage empty input
+- allow async items input
+- portal for items
+- add ShellJS for packaging command.
+- customising arrows
+
+## Todos
+- improve styles
+- fix package dependencies
