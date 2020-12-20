@@ -7,7 +7,7 @@
 	"license": "ISC",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/KevinAlbrecht/slider-vue.git"
+		"url": "git+https://github.com/KevinAlbrecht/carousel-vue.git"
 	},
 	"keywords": [
 		"carousel",
@@ -15,9 +15,9 @@
 		"vue 2"
 	],
 	"bugs": {
-		"url": "https://github.com/KevinAlbrecht/slider-vue/issues"
+		"url": "https://github.com/KevinAlbrecht/carousel-vue/issues"
 	},
-	"homepage": "https://github.com/KevinAlbrecht/slider-vue#readme",
+	"homepage": "https://github.com/KevinAlbrecht/carousel-vue#readme",
 	"files": [
 		"dist/*",
 		"types/*"
