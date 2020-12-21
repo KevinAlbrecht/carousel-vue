@@ -1,16 +1,19 @@
-# Slider vue
+# Carousel vue
 
-This component is a simple slider, inspired by the netflix's movies one.
+This component is a simple carousel, inspired by the netflix's movies one.
 The carousel can be finite or looping endlessly in both ways.
 
 ## Demo
 (available soon)
-## Project setup
+## Add to your project
+```bash
+npm i @kalbrecht/carousel-vue
 ```
+## Project setup from sources
+```bash
 npm install
-npm run build
+npm run build && npm pack
 ```
-Then you can package it
 
 **/!\ Attention, the "bp" script use the windows command "move", switching to shelljs is in TODOs**
 
@@ -18,11 +21,11 @@ Then you can package it
 ### Props
 - **items**: the actual list of items to use in the carousel ( a complete list is needed for the moment ) you can use like the following : 
 ```html
-<KalSlider :items="latest">
+<KalCarousel :items="latest">
 	<template v-slot:default="props">
 		{{props.item}}
 	</template>
-</KalSlider>
+</KalCarousel>
 ```
 - **title**: A title you want to show (will be removed)
 - **chunkSize**: The size of elements you want to show
