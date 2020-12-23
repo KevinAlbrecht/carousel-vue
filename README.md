@@ -1,4 +1,5 @@
 # Carousel vue
+[![](https://badgen.net/bundlephobia/minzip/@kalbrecht/carousel-vue)](https://www.npmjs.com/package/@kalbrecht/carousel-vue)
 
 This component is a simple carousel, inspired by the netflix's movies one.
 The carousel can be finite or looping endlessly in both ways.
@@ -21,7 +22,7 @@ npm run build && npm pack
 ### Props
 - **items**: the actual list of items to use in the carousel ( a complete list is needed for the moment ) you can use like the following : 
 ```html
-<KalCarousel :items="latest">
+<KalCarousel :items="myList">
 	<template v-slot:default="props">
 		{{props.item}}
 	</template>
@@ -46,14 +47,14 @@ directionLeft:boolean
 - **i_click**: when the user click on an item, the payload is the current item.
 ## Roadmap
 - manage empty input
-- allow async items input
+- allow lazy loading input
 - portal for items
 - add ShellJS for packaging command.
 - customising arrows
 - vue3
+- add touch slide event
 
 ## Todos
-- improve styles
-- fix package dependencies
-- rework events
-- refactoring
+- reduce package size
+- check SSR compatibility
+- eternal refactoring
