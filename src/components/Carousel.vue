@@ -73,7 +73,7 @@ export default class Slider<T> extends Vue {
   isInfinite = false;
   pagesCount = 0;
   activePage = 1;
-  vItems: T[] = !this.items?[]:[...this.items];
+  vItems: T[] = !this.items ? [] : [...this.items];
   inTransition = false;
   translate = 0;
   rawBoxPart = 20;
@@ -125,10 +125,14 @@ export default class Slider<T> extends Vue {
     const event: SliderEvent = isLeft ? "slide_left" : "slide_right";
 
     if (
-      this.inTransition === true ||
-      (!this.loop &&
-        ((!isLeft && this.activePage === this.pagesCount) ||
-          (isLeft && this.activePage === 1)))
+      this.hasTopreventSlide(
+        this.inTransition,
+        this.loop,
+        isLeft,
+        this.activePage,
+        this.pagesCount,
+        this.isInfinite
+      )
     )
       return;
 
@@ -185,6 +189,25 @@ export default class Slider<T> extends Vue {
   click(item: T): void {
     const evt: SliderEvent = "i_click";
     this.$emit(evt, item);
+  }
+
+  private hasTopreventSlide(
+    inTransition: boolean,
+    loop: boolean,
+    isLeft: boolean,
+    activePage: number,
+    pagesCount: number,
+    isInfinite: boolean
+  ): boolean {
+    return (
+      inTransition === true ||
+      (!loop &&
+        ((!isLeft && activePage === pagesCount) ||
+          (isLeft && activePage === 1))) ||
+      (loop &&
+        ((isLeft && activePage === 1 && !isInfinite) ||
+          (!isLeft && activePage === pagesCount && !isInfinite)))
+    );
   }
 
   private computeIsNavDisabled(
