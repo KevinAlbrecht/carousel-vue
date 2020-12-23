@@ -1,6 +1,6 @@
 {
 	"name": "@kalbrecht/carousel-vue",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"private": false,
 	"description": "Simple carousel in vue, inspired by netflix movies carousel",
 	"author": "Kalbrecht",
@@ -26,28 +26,32 @@
 	"main": "./dist/carousel-vue.umd.js",
 	"scripts": {
 		"build": "vue-cli-service build --target lib src/index.ts",
-		"bp": "npm run build && npm pack && move ./kalbrecht-carousel-vue-0.1.0.tgz .."
+		"bp": "npm run build && npm pack && move ./kalbrecht-carousel-vue-0.1.2.tgz .."
 	},
 	"dependencies": {},
 	"peerDependencies": {
-		"core-js": "^3.6.5",
 		"vue": "^2.6.11"
 	},
 	"devDependencies": {
+		"core-js": "^3.6.5",
 		"vue-class-component": "^7.2.3",
 		"vue-property-decorator": "^8.4.2",
+		"@types/jest": "^24.0.19",
 		"@typescript-eslint/eslint-plugin": "^2.33.0",
 		"@typescript-eslint/parser": "^2.33.0",
 		"@vue/cli-plugin-babel": "~4.5.0",
 		"@vue/cli-plugin-eslint": "~4.5.0",
-		"@vue/cli-service": "~4.5.0",
 		"@vue/cli-plugin-typescript": "~4.5.0",
+		"@vue/cli-plugin-unit-jest": "~4.5.0",
+		"@vue/cli-service": "~4.5.0",
 		"@vue/eslint-config-typescript": "^5.0.2",
-		"babel-eslint": "^10.1.0",
+		"@vue/test-utils": "^1.0.3",
 		"eslint": "^6.7.2",
 		"eslint-plugin-vue": "^6.2.2",
-		"vue-template-compiler": "^2.6.11",
-		"typescript": "~3.9.3"
+		"sass": "^1.26.5",
+		"sass-loader": "^8.0.2",
+		"typescript": "~3.9.3",
+		"vue-template-compiler": "^2.6.11"
 	},
 	"eslintConfig": {
 		"root": true,
@@ -79,5 +83,8 @@
 		"> 1%",
 		"last 2 versions",
 		"not dead"
-	]
+	],
+	"jest": {
+		"preset": "@vue/cli-plugin-unit-jest/presets/typescript-and-babel"
+	}
 }

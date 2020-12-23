@@ -1,1 +1,1 @@
-export { default as KalSlider } from "./components/slider/Slider.vue";
+export { default as KalCarousel } from './components/Carousel.vue';
